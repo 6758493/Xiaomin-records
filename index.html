@@ -1,1 +1,68 @@
-<!-- index.html placeholder -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小民日常生活平台</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <!-- 背景视频 -->
+  <video autoplay muted loop class="background-video">
+    <source src="./mp4/505.mp4" type="video/mp4" />
+    您的浏览器不支持视频播放。
+  </video>
+
+  <!-- 提示消息 -->
+  <p id="savedMsg" class="saved-message hidden">✅ 提示已保存</p>
+
+  <!-- 主卡片 -->
+  <div class="container card">
+    <h1 class="title">那些年错过的黑历史</h1>
+
+    <!-- 搜索框 -->
+    <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="请输入视频关键词" />
+      <button onclick="searchVideo()">搜</button>
+    </div>
+
+    <!-- 视频区域 -->
+    <div id="videoContainer" class="hidden video-area">
+      <div class="video-wrapper">
+        <video id="videoPlayer" controls></video>
+        <div id="danmakuLayer" class="danmaku-layer"></div>
+      </div>
+      <div class="likes">
+        <button id="likeBtn">❤️ 点赞</button>
+        <span id="likeCount">0</span>
+      </div>
+      <div class="comment-area">
+        <input id="commentInput" type="text" placeholder="输入弹幕..." />
+        <input id="colorInput" type="color" value="#ffffff" />
+        <button onclick="addComment()">发送</button>
+      </div>
+      <div class="upload-area">
+        <label for="uploadInput">📤 上传视频</label>
+        <input id="uploadInput" type="file" accept="video/*" class="hidden" onchange="handleUpload()" />
+      </div>
+    </div>
+
+    <p id="message" class="error-message hidden"></p>
+  </div>
+
+  <!-- 弹出提示框 -->
+  <div id="popupCard" class="popup hidden">
+    <svg id="cookieSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <g><path d="M512 256A256 256 0 1 1 0 256a256 256 0 0 1 512 0z" /></g>
+    </svg>
+    <span class="cookieHeading">友情提示</span>
+    <p class="cookieDescription">请勿上传任何违法违规内容，所有操作仅供学习研究。</p>
+    <div class="buttonContainer">
+      <button class="acceptButton" onclick="closePopup()">我知道了</button>
+    </div>
+  </div>
+
+  <script src="./js/script.js"></script>
+</body>
+</html>
