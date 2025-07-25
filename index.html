@@ -4,58 +4,160 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>小民日常生活平台</title>
-  <link rel="stylesheet" href="./css/style.css" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    .background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+    .card {
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .max-w-xl {
+      max-width: 15rem !important;
+    }
+    .danmaku-text {
+      position: absolute;
+      white-space: nowrap;
+      animation: danmaku-move 10s linear forwards;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px black;
+    }
+    @keyframes danmaku-move {
+      0% { left: 100%; }
+      100% { left: -100%; }
+    }
+
+    #popupCard {
+      width: 300px;
+      height: 220px;
+      background-color: rgb(255, 255, 255);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 30px;
+      gap: 13px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+      box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+
+    #cookieSvg {
+      width: 50px;
+    }
+
+    #cookieSvg g path {
+      fill: rgb(97, 81, 81);
+    }
+
+    .cookieHeading {
+      font-size: 1.2em;
+      font-weight: 800;
+      color: rgb(26, 26, 26);
+    }
+
+    .cookieDescription {
+      text-align: center;
+      font-size: 0.7em;
+      font-weight: 600;
+      color: rgb(99, 99, 99);
+    }
+
+    .buttonContainer {
+      display: flex;
+      gap: 20px;
+      flex-direction: row;
+    }
+
+    .acceptButton {
+      width: 80px;
+      height: 30px;
+      background-color: #7b57ff;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 6px -1px #977ef3;
+    }
+
+    .acceptButton:hover {
+      background-color: #9173ff;
+      box-shadow: 0 10px 15px -3px #977ef3;
+    }
+  </style>
 </head>
-<body>
-  <!-- 背景视频 -->
+<body class="flex items-center justify-center min-h-screen px-4">
   <video autoplay muted loop class="background-video">
     <source src="./mp4/505.mp4" type="video/mp4" />
     您的浏览器不支持视频播放。
   </video>
 
-  <!-- 提示消息 -->
-  <p id="savedMsg" class="saved-message hidden">✅ 提示已保存</p>
+  <!-- ✅ 提示已保存消息 -->
+  <p id="savedMsg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white py-2 px-4 rounded shadow-lg z-50 hidden transition-opacity duration-500">
+    ✅ 提示已保存
+  </p>
 
-  <!-- 主卡片 -->
-  <div class="container card">
-    <h1 class="title">那些年错过的黑历史</h1>
-
-    <!-- 搜索框 -->
-    <div class="search-bar">
-      <input id="searchInput" type="text" placeholder="请输入视频关键词" />
-      <button onclick="searchVideo()">搜</button>
+  <!-- ✅ 页面主内容 -->
+  <div class="w-full max-w-5xl card">
+    <h1 class="text-3xl font-bold text-blue-600 text-center mb-4">那些年错过的黑历史</h1>
+    <div class="relative rounded-full overflow-hidden bg-white shadow-xl w-full sm:w-2/3 mx-auto mb-6">
+      <input id="searchInput" class="bg-transparent outline-none border-none pl-6 pr-10 py-4 w-full text-lg font-semibold" placeholder="请输入视频关键词" type="text" />
+      <div class="absolute right-2 top-[0.4em]">
+        <button onclick="searchVideo()" class="w-12 h-12 bg-violet-500 rounded-full text-white font-bold">搜</button>
+      </div>
     </div>
 
-    <!-- 视频区域 -->
-    <div id="videoContainer" class="hidden video-area">
-      <div class="video-wrapper">
-        <video id="videoPlayer" controls></video>
-        <div id="danmakuLayer" class="danmaku-layer"></div>
+    <div id="videoContainer" class="hidden flex flex-col items-center">
+      <div class="relative w-full max-w-xl">
+        <video id="videoPlayer" controls class="w-full rounded-xl shadow-lg mb-4"></video>
+        <div id="danmakuLayer" class="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden"></div>
       </div>
-      <div class="likes">
-        <button id="likeBtn">❤️ 点赞</button>
-        <span id="likeCount">0</span>
+
+      <div class="flex justify-center items-center gap-3 mb-4">
+        <button id="likeBtn" class="text-pink-500 font-bold text-lg">❤️ 点赞</button>
+        <span id="likeCount" class="text-gray-700">0</span>
       </div>
-      <div class="comment-area">
-        <input id="commentInput" type="text" placeholder="输入弹幕..." />
-        <input id="colorInput" type="color" value="#ffffff" />
-        <button onclick="addComment()">发送</button>
+
+      <div class="flex items-center gap-2 w-full max-w-xl mb-4">
+        <input id="commentInput" type="text" placeholder="输入弹幕..." class="flex-1 px-3 py-2 rounded bg-gray-200 border border-gray-400" />
+        <input id="colorInput" type="color" value="#ffffff" class="w-10 h-10 rounded-full border border-gray-400" />
+        <button onclick="addComment()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">发送</button>
       </div>
-      <div class="upload-area">
-        <label for="uploadInput">📤 上传视频</label>
+
+      <div class="flex items-center gap-2 w-full max-w-xl">
+        <label for="uploadInput" class="px-4 py-2 bg-green-600 text-white rounded cursor-pointer hover:bg-green-700">📤 上传视频</label>
         <input id="uploadInput" type="file" accept="video/*" class="hidden" onchange="handleUpload()" />
       </div>
     </div>
 
-    <p id="message" class="error-message hidden"></p>
+    <p id="message" class="text-red-600 text-center mt-4 hidden"></p>
   </div>
 
-  <!-- 弹出提示框 -->
-  <div id="popupCard" class="popup hidden">
-    <svg id="cookieSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-      <g><path d="M512 256A256 256 0 1 1 0 256a256 256 0 0 1 512 0z" /></g>
-    </svg>
+  <!-- ✅ 友情提示弹窗 -->
+  <div id="popupCard" class="hidden">
+    <svg id="cookieSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g><path d="M512 256A256 256 0 1 1 0 256a256 256 0 0 1 512 0z"/></g></svg>
     <span class="cookieHeading">友情提示</span>
     <p class="cookieDescription">请勿上传任何违法违规内容，所有操作仅供学习研究。</p>
     <div class="buttonContainer">
@@ -63,6 +165,110 @@
     </div>
   </div>
 
-  <script src="./js/script.js"></script>
+  <script>
+    const sound = new Audio("data:audio/mp3;base64,SUQzAwAAAAAAF1RTU0UAAAAPAAADTGF2ZjU2LjM4LjEwMAAAAAAAAAAAAAAA//tQxAADB8AhSmxhdmYzOC4xMi4wAAADhG1pbnQAAA/wAAACAAACcQCAAMEVGRhdGEAAAAA/////w==");
+
+    let videos = {
+      "吃屎": "./mp4/108.mp4",
+      "火烧": "./mp4/hs.mp4",
+      "demo.mp4": "./mp4/demo.mp4",
+      "video1": "./mp4/video1.mp4"
+    };
+    Object.assign(videos, JSON.parse(localStorage.getItem("uploadedVideos") || "{}"));
+
+    function searchVideo() {
+      const input = document.getElementById("searchInput").value.trim();
+      const matchKey = Object.keys(videos).find((key) => key.includes(input));
+      const container = document.getElementById("videoContainer");
+      const msg = document.getElementById("message");
+      if (!input) {
+        msg.textContent = "请输入搜索内容";
+        msg.classList.remove("hidden");
+        container.classList.add("hidden");
+        return;
+      }
+      if (matchKey) {
+        document.getElementById("videoPlayer").src = videos[matchKey];
+        container.classList.remove("hidden");
+        msg.classList.add("hidden");
+        updateLikeUI(matchKey);
+        loadDanmakus(matchKey);
+      } else {
+        msg.textContent = `未找到 “${input}” 的视频`;
+        msg.classList.remove("hidden");
+        container.classList.add("hidden");
+      }
+    }
+
+    function updateLikeUI(key) {
+      const count = localStorage.getItem(`like_${key}`) || 0;
+      document.getElementById("likeCount").textContent = count;
+      document.getElementById("likeBtn").onclick = () => {
+        let n = parseInt(localStorage.getItem(`like_${key}`) || 0);
+        localStorage.setItem(`like_${key}`, ++n);
+        document.getElementById("likeCount").textContent = n;
+      };
+    }
+
+    function addComment() {
+      const text = document.getElementById("commentInput").value.trim();
+      const color = document.getElementById("colorInput").value;
+      const key = document.getElementById("searchInput").value.trim();
+      if (!text || !key) return;
+      const list = JSON.parse(localStorage.getItem(`comments_${key}`) || "[]");
+      list.push({ text, color });
+      localStorage.setItem(`comments_${key}`, JSON.stringify(list));
+      appendDanmaku(text, color);
+      document.getElementById("commentInput").value = "";
+    }
+
+    function appendDanmaku(text, color) {
+      const el = document.createElement("div");
+      el.textContent = text;
+      el.className = "danmaku-text";
+      el.style.top = Math.random() * 80 + "%";
+      el.style.color = color;
+      document.getElementById("danmakuLayer").appendChild(el);
+      setTimeout(() => el.remove(), 10000);
+    }
+
+    function loadDanmakus(key) {
+      const list = JSON.parse(localStorage.getItem(`comments_${key}`) || "[]");
+      document.getElementById("danmakuLayer").innerHTML = "";
+      list.forEach(({ text, color }, i) => setTimeout(() => appendDanmaku(text, color), i * 800));
+    }
+
+    function handleUpload() {
+      const file = document.getElementById("uploadInput").files[0];
+      if (!file) return alert("请选择视频文件");
+      const name = prompt("给这个视频起个名字：");
+      if (!name) return;
+      const url = URL.createObjectURL(file);
+      videos[name] = url;
+      localStorage.setItem("uploadedVideos", JSON.stringify(videos));
+      alert(`上传成功！你可以搜索 “${name}” 来播放它。`);
+    }
+
+    function closePopup() {
+      const popup = document.getElementById("popupCard");
+      const msg = document.getElementById("savedMsg");
+      popup.style.opacity = "0";
+      popup.style.transition = "opacity 0.4s ease";
+      msg.classList.remove("hidden");
+      msg.style.opacity = "1";
+      sound.play();
+      setTimeout(() => {
+        popup.classList.add("hidden");
+        msg.style.opacity = "0";
+      }, 2000);
+      localStorage.setItem("popupAccepted", "yes");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      if (!localStorage.getItem("popupAccepted")) {
+        document.getElementById("popupCard").classList.remove("hidden");
+      }
+    });
+  </script>
 </body>
 </html>
